@@ -3,7 +3,7 @@ from urllib import parse
 import requests
 
 class ApiClient:
-    def __init__(self, api_key, base_url="https://cockpit.shirtigo.de/api/"):
+    def __init__(self, api_key, base_url="https://cockpit.shirtigo.de/api/", ignore_certificates=False):
         # store base url, resource url will be appended
         self.base_url = base_url
 
@@ -17,7 +17,12 @@ class ApiClient:
             "Accept": "application/json"
         })
 
+        if ignore_certificates:
+            # disable SSL certificate validation
+            self.session.verify = False
+
     def _request(self, url, method="GET", data=None, params=None, files=None):
+        # construct full URL
         url = parse.urljoin(self.base_url, url)
 
         headers = {}
