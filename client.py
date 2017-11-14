@@ -38,6 +38,11 @@ class ApiClient:
 
         # issue request
         response = self.session.request(method, url, json=data, params=params, files=files, headers=headers)
+
+        if response.status_code == 204:
+            # 204 = No Content (expected)
+            return None
+
         response_data = response.json()
 
         if not response.ok:
