@@ -47,9 +47,9 @@ class ApiClient:
                     raise RuntimeError("Authentication error. Make sure that the client base url exactly matches the documentation.")
                 else:
                     raise RuntimeError("Authentication error. Check whether the provided API key is valid.")
-            elif response.status_code == 422:
+            elif response.status_code == 422 and "errors" in response_data :
                 raise ValueError("Input validation failed: %r" % response_data["errors"])
-            elif 'message' in response_data:
+            elif "message" in response_data:
                 raise RuntimeError("Endpoint returned HTTP status %d: %s" %
                     (response.status_code, response_data["message"]))
             else:
