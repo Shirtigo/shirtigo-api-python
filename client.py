@@ -50,7 +50,7 @@ class ApiClient:
                 if response.request.url != url:
                     raise RuntimeError("Authentication error. Make sure that the client base url exactly matches the documentation.")
                 else:
-                    raise RuntimeError("Authentication error. Check whether the provided API key is valid.")
+                    raise RuntimeError("Authentication error. Check whether the provided API token is valid.")
             elif response.status_code == 403 and "required_scopes" in response_data:
                 raise RuntimeError("Authorization error. API token requires the following scope(s): %s" % ", ".join(response_data["required_scopes"]))
             elif response.status_code == 422 and "errors" in response_data :
