@@ -1,4 +1,5 @@
 from urllib import parse
+import warnings
 
 import requests
 
@@ -6,6 +7,10 @@ class ApiClient:
     def __init__(self, api_key, base_url="https://cockpit.shirtigo.de/api/", ignore_certificates=False):
         # store base url, resource url will be appended
         self.base_url = base_url
+
+        # warn on very short api key
+        if len(api_key) < 100:
+            warnings.warn("The provided API token appears to be shorter than expected.")
 
         # initialize requests Session in order to share headers/cookies between requests
         self.session = requests.Session()
@@ -37,7 +42,18 @@ class ApiClient:
 
         if not response.ok:
             # extract error and throw Python exception
-            raise RuntimeError(response_data["message"])
+            if response.status_code == 401:
+                if response.request.url != url:
+                    raise RuntimeError("Authentication error. Make sure that the client base url exactly matches the documentation.")
+                else:
+                    raise RuntimeError("Authentication error. Check whether the provided API key is valid.")
+            elif response.status_code == 422:
+                raise ValueError("Input validation failed: %r" % response_data["errors"])
+            elif 'message' in response_data:
+                raise RuntimeError("Endpoint returned HTTP status %d: %s" %
+                    (response.status_code, response_data["message"]))
+            else:
+                raise RuntimeError("Endpoint returned unhandled HTTP status %d", response.status_code)
 
         return response_data
 
