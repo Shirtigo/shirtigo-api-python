@@ -1,5 +1,6 @@
 # shirtigo-api-python
-A python implementation of a client for the shirtigo print API
+A python implementation of a client for the shirtigo print API.
+Check out our [REST-API documentation](https://cockpit.shirtigo.de/docs/rest-api/) for a full list of all features.
 
 # Basic usage
 ## Client object initialization
@@ -14,7 +15,7 @@ client = ApiClient(API_TOKEN, BASE_URL)
     print(data["firstname"], data["lastname"])
 ```
 
-## create a project
+## Create a project
 ```
     data = {'name' : "My test project " + random_string() }
     project = client.post('projects', data=data)
@@ -120,7 +121,7 @@ Let's create a product with our design on the shirt front
                 "products": products
     }
 ```
-## check the current price for a planned order
+## Check the current price for a planned order
 ```
     prices = client.post('orders/predict-price', data=order_data)
 ```
