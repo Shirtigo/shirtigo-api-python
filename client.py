@@ -43,25 +43,29 @@ class ApiClient:
             # 204 = No Content (expected)
             return None
 
-        response_data = response.json()
-        if not response.ok:
-            # extract error and throw Python exception
-            if response.status_code == 401:
-                if response.request.url != url:
-                    raise RuntimeError("Authentication error. Make sure that the client base url exactly matches the documentation.")
+        if response.headers['content-type'].startswith('application/json'):
+            response_data = response.json()
+            if not response.ok:
+                # extract error and throw Python exception
+                if response.status_code == 401:
+                    if response.request.url != url:
+                        raise RuntimeError("Authentication error. Make sure that the client base url exactly matches the documentation.")
+                    else:
+                        raise RuntimeError("Authentication error. Check whether the provided API token is valid.")
+                elif response.status_code == 403 and "required_scopes" in response_data:
+                    raise RuntimeError("Authorization error. API token requires the following scope(s): %s" % ", ".join(response_data["required_scopes"]))
+                elif response.status_code == 422 and "errors" in response_data :
+                    raise ValueError("Input validation failed: %r" % response_data["errors"])
+                elif "message" in response_data:
+                    raise RuntimeError("Endpoint returned HTTP status %d: %s" %
+                        (response.status_code, response_data["message"]))
                 else:
-                    raise RuntimeError("Authentication error. Check whether the provided API token is valid.")
-            elif response.status_code == 403 and "required_scopes" in response_data:
-                raise RuntimeError("Authorization error. API token requires the following scope(s): %s" % ", ".join(response_data["required_scopes"]))
-            elif response.status_code == 422 and "errors" in response_data :
-                raise ValueError("Input validation failed: %r" % response_data["errors"])
-            elif "message" in response_data:
-                raise RuntimeError("Endpoint returned HTTP status %d: %s" %
-                    (response.status_code, response_data["message"]))
-            else:
-                raise RuntimeError("Endpoint returned unhandled HTTP status %d", response.status_code)
+                    raise RuntimeError("Endpoint returned unhandled HTTP status %d", response.status_code)
 
-        return response_data
+            return response_data
+        else:
+            raise RuntimeError("The response is expected to be in json format. The actual response is: {}".format(response.text))
+
 
     def get(self, url, params=None):
         return self._request(url, "GET", None, params)
