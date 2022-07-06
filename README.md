@@ -1,11 +1,11 @@
 # shirtigo-api-python
 A python implementation of a client for the shirtigo print API.
-Check out our [REST-API documentation](https://cockpit.shirtigo.de/docs/rest-api/) for a full list of all features.
+Check out our [REST-API documentation](https://cockpit.shirtigo.com/docs/rest-api/) for a full list of all features.
 
 # Basic usage
 ## Client object initialization
 ```
-BASE_URL = "https://cockpit.shirtigo.de/api/"
+BASE_URL = "https://cockpit.shirtigo.com/api/"
 API_TOKEN = "YOUR_API_TOKEN"
 client = ApiClient(API_TOKEN, BASE_URL)
 ```
