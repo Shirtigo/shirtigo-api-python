@@ -4,7 +4,7 @@ import warnings
 import requests
 
 class ApiClient:
-    def __init__(self, api_key, base_url="https://cockpit.shirtigo.de/api/", ignore_certificates=False):
+    def __init__(self, api_key, base_url="https://cockpit.shirtigo.com/api/", ignore_certificates=False):
         # store base url, resource url will be appended
         self.base_url = base_url
 
