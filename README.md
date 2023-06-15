@@ -15,12 +15,6 @@ client = ApiClient(API_TOKEN, BASE_URL)
     print(data["firstname"], data["lastname"])
 ```
 
-## Create a project
-```
-    data = {'name' : "My test project " + random_string() }
-    project = client.post('projects', data=data)
-```
-
 ## Uploading a design
  The product creation reqires to upload a design first.
 ### From file:
@@ -41,50 +35,43 @@ client = ApiClient(API_TOKEN, BASE_URL)
     designs = client.get('designs')['data']
 ```
 
-## Add a processing area to a project
+# Create a product collection
+Products are organized into collections, with each baseProduct being assignable to a collection/ project only once. To create a new product, first create a project, and then, in a subsequent step, assign the desired products to that project.
+
+## Create a project
 ```
-    data= {
-          "area": "front",
-          "position": "center",
-          "method": "print",
-          "design": design['reference'],
-          "offset_top": 300,
-          "offset_center": 10,
-          "width": 200,
-          # "base_products" : [ ids]
-    }
-    client.post("projects/" + project['reference'] + "/processings", data=data)
+    data = {'name' : "My test project " + random_string() }
+    project = client.post('projects', data=data)
 ```
 
-## Get a list of available base products to process (print)
+## Add a product to the project
+In this example we will add a black Organic Shirt with a one-sided print to our project. The processing specifications define the design, its placement, dimensions, and other relevant details needed for customizing the BaseProduct. Please not, that you can add custom processings for each color.
 ```
-    base_products = client.get('base-products')['data']
-```
+data = {
+    "project_id": project.reference,
+    "base_product_id": 235,
+    "processings": [
+        {
+            "processingarea_type": "front",
+            "processingmethod": "dtg",
+            "design_reference": design.reference,
+            "offset_top": 50,
+            "offset_center": 0,
+            "width": 250,
+            "is_customizable": False,
+            "force_position": False,
+            "colors": [
+                {
+                    "colorId": 326,
+                    "price": 2195,
+                    "sortPosition": 1
+                }
+            ]
+        }
+    ]
+}
 
-we select the last one for our test
-```
-    base_product = base_products[-1]
-    colors = [color['id'] for color in base_product['colors']['data']]
-    test_sizes = [color['sizes'][0]['id'] for color in base_product['colors']['data']]
-```
-
-## Create a product
-Product creation combines a base product, and a project.
-Let's create a product with our design on the shirt front
-```
-    data = {
-    "project_id": project['reference'],
-    "base_product_id": base_product['id'],
-    "colors": colors
-    }
-    product = client.post('products', data = data)
-```
-
-## Publish finished project
- Finished projects need to be published before products can be ordered from a project
-```
-    data = {'project-reference' : project['reference']}
-    response = client.post('projects/' + project['reference'] + '/publish')
+$product = client.post('customized-product', data=data)
 ```
 
 ## Order a list of products
